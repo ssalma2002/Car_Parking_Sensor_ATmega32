@@ -1,0 +1,54 @@
+/*
+ * main.c
+ *
+ *  Created on: Oct 16, 2024
+ *      Author: syous
+ */
+#include "ultrasonic.h"
+#include "lcd.h"
+#include "buzzer.h"
+#include"common_macros.h"
+
+
+int main(void){
+	SET_BIT(SREG,7);
+	Ultrasonic_init();
+	LCD_init();
+	Buzzer_init();
+
+	uint16 distance;
+
+	LCD_displayStringRowColumn(0,3,"Ultrasonic");
+	LCD_displayStringRowColumn(1,0,"Distance: ");
+	while(1){
+		distance = Ultrasonic_readDistance();
+		LCD_moveCursor(1,11);
+		LCD_intgerToString(distance);
+		LCD_displayString("cm ");
+		if(distance < 6){
+			LCD_clearScreen();
+						LCD_displayStringRowColumn(0, 0, "Critical alert!");
+						Buzzer_on();
+		}
+		else if (distance < 5) {
+					LED_on(red);
+					LED_on(green);
+					LED_on(blue);
+				} else if (distance > 5 && distance < 11) {
+					LED_on(red);
+					LED_on(green);
+					LED_off(blue);
+				} else if (distance > 10 && distance < 16) {
+					LED_on(red);
+					LED_off(green);
+					LED_off(blue);
+				} else if (distance > 20) {
+					LED_off(red);
+					LED_off(green);
+					LED_off(blue);
+				}
+
+
+
+	}
+}
